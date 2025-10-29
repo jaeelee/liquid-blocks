@@ -1,0 +1,32 @@
+.bottle {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 40px;
+    margin: 10px;
+    border: 3px solid #333;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    overflow: hidden;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+}
+
+.bottle:focus {
+    outline: none;
+}
+
+.bottle-selected {
+    border-color: #007AFF;
+}
+
+.liquid {
+    width: 100%;
+    height: 40px;
+}
+
+.liquid-last {
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+}

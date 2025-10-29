@@ -1,0 +1,31 @@
+.header {
+    position: sticky;
+    top: 0;
+    background: #1a1a1a;
+    padding: 12px;
+    border-bottom: 1px solid #333;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.back-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.header-title {
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.header-right {
+    width: 28px;
+}

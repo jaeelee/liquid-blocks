@@ -1,0 +1,54 @@
+.picker-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: flex-end;
+}
+
+.picker-body {
+    width: 100%;
+    background: #222;
+    color: #fff;
+    padding: 16px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.picker-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.picker-row {
+    margin-bottom: 12px;
+}
+
+.picker-select {
+    width: 100%;
+    padding: 10px;
+    background: #1a1a1a;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 8px;
+}
+
+.picker-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.picker-actions button {
+    padding: 8px 12px;
+    background: #2a2a2a;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.picker-actions button:hover {
+    background: #333;
+}

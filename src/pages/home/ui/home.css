@@ -1,0 +1,35 @@
+.home-container {
+    min-height: 100vh;
+    padding: 20px;
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.home-section {
+    margin-bottom: 20px;
+}
+
+.home-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.home-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.home-button {
+    padding: 10px 14px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.home-button:hover {
+    background: #333;
+}
