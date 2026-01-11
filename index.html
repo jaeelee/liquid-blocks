@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,7 +7,16 @@
     <title>package.json</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div class="wrap" id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- ##height overflow hidden 이슈로 히든처리  -->
+    <!-- <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+          const wrap = document.querySelector(".wrap");
+          if (wrap) wrap.classList.add("is-filled");
+        }, 300);
+      });
+    </script> -->
   </body>
 </html>
