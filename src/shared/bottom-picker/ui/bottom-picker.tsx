@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import './bottom-picker.css'
 
 interface PickerProps<T extends string | number> {
