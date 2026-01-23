@@ -45,7 +45,7 @@ export const Home: React.FC = () => {
             onValueChange={(value) =>
               setSettings((prev) => ({ ...prev, bottleHeight: value }))
             }
-            values={[3, 4, 5, 6, 7, 8, 9, 10]}
+            values={[4, 5, 6, 7, 8, 9, 10]}
             isVisible={isVisible === "bottleSize"}
             setIsVisible={(v) => setIsVisible(v ? "bottleSize" : null)}
           />
