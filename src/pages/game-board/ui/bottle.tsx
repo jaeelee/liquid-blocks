@@ -1,9 +1,14 @@
 import React from "react";
 import { LIQUID_HEIGHT } from "../lib/constants";
 
+export interface LiquidColor {
+  color: string;
+  isVisible: boolean;
+}
+
 interface Props {
   onClick: () => void;
-  colors: string[];
+  colors: LiquidColor[];
   isSelected?: boolean;
   maxLiquidCount: number;
 }
@@ -16,13 +21,16 @@ export const Bottle: React.FC<Props> = React.memo(
         style={{ height: maxLiquidCount * LIQUID_HEIGHT + 25 }}
         onClick={onClick}
       >
-        {[...colors].reverse().map((color, idx) => {
+        {[...colors].reverse().map(({ color, isVisible }, idx) => {
           const isLast = idx === colors.length - 1;
           return (
             <div
               key={idx}
-              className={`liquid ${isLast ? "liquid-last" : ""}`}
-              style={{ backgroundColor: color }}
+              className={`liquid ${isLast ? "liquid-last" : ""} ${!isVisible ? "liquid-hidden" : ""}`}
+              style={{
+                backgroundColor: isVisible ? color : "var(--liquid-hidden, #888)",
+                opacity: isVisible ? 1 : 0.6,
+              }}
             />
           );
         })}

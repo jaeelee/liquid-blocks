@@ -5,8 +5,9 @@ import { PuzzleGeneratorAPI } from "../lib/game-generator";
 import { GameAPI } from "../lib/game-logic";
 import { clearGame, saveGame } from "../../../entities/game/model/storage";
 import { isSolved } from "../lib/game-solver";
+import { DifficultyManager } from "../lib/difficulty-manager";
+import type { ColorVisibility } from "../lib/difficulty-manager";
 import { Bottle } from "./bottle";
-// import { useHome } from "../lib/hooks";
 
 export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
   bottleHeight = 4,
@@ -25,12 +26,17 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
     [finalBottleHeight]
   );
 
+  const difficulty = settings?.difficulty ?? "easy";
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [solved, setSolved] = useState(false);
+  const [revealedPositions, setRevealedPositions] = useState<ColorVisibility>(() => ({}));
+
+  const difficultyManager = useMemo(() => DifficultyManager.getInstance(), []);
 
   const generatePuzzle = useCallback(() => {
     if (game && game.length > 0) return game;
 
+    difficultyManager.resetRevealedColors();
     const finalNumColors = settings?.numColors || numColors;
     const finalNumBottles = finalNumColors + 2;
 
@@ -46,7 +52,7 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
       difficulty: settings?.difficulty || "easy",
     });
     return puzzle;
-  }, [game, settings, finalBottleHeight, numColors]);
+  }, [game, settings, finalBottleHeight, numColors, difficultyManager]);
 
   const [puzzle, setPuzzle] = useState<Puzzle>(() => generatePuzzle());
 
@@ -59,6 +65,8 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
 
       const result = gameAPI.autoMoveLiquid(puzzle, selectedIndex, index);
       if (result.success && result.newState) {
+        difficultyManager.revealTopColors(result.newState);
+        setRevealedPositions(difficultyManager.getRevealedColors());
         setPuzzle(result.newState);
         setSelectedIndex(-1);
       } else {
@@ -74,6 +82,17 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
       setSelectedIndex(index);
     }
   };
+
+  useEffect(() => {
+    difficultyManager.resetRevealedColors();
+    setRevealedPositions({});
+  }, [difficultyManager]);
+
+  const visiblePuzzle = useMemo(
+    () =>
+      difficultyManager.calculateVisibility(puzzle, difficulty, revealedPositions),
+    [puzzle, difficulty, revealedPositions, difficultyManager]
+  );
 
   useEffect(() => {
     if (isSolved(puzzle, finalBottleHeight)) {
@@ -93,6 +112,7 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
                 <button
                   onClick={() => {
                     setSolved(false);
+                    setRevealedPositions({});
                     setPuzzle(generatePuzzle());
                   }}
                 >
@@ -105,13 +125,16 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
         )}
 
         <div className="board-grid">
-          {puzzle.map((colors, index) => (
+          {visiblePuzzle.bottles.map((bottle, index) => (
             <Bottle
               key={index}
               maxLiquidCount={finalBottleHeight}
               onClick={() => handleBottleClick(index)}
               isSelected={selectedIndex === index}
-              colors={colors.map((e) => COLOR[e])}
+              colors={bottle.colors.map(({ color, isVisible }) => ({
+                color: COLOR[color],
+                isVisible,
+              }))}
             />
           ))}
         </div>
