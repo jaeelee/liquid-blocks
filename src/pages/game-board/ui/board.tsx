@@ -19,6 +19,7 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
   const params = location.state || {};
   const game = params.game as Puzzle | undefined;
   const settings = params.settings as GameState | undefined;
+  const savedRevealed = params.revealedPositions as ColorVisibility | undefined;
 
   const finalBottleHeight = settings?.bottleHeight || bottleHeight;
   const gameAPI = useMemo(
@@ -29,7 +30,7 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
   const difficulty = settings?.difficulty ?? "easy";
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [solved, setSolved] = useState(false);
-  const [revealedPositions, setRevealedPositions] = useState<ColorVisibility>(() => ({}));
+  const [revealedPositions, setRevealedPositions] = useState<ColorVisibility>(() => savedRevealed ?? {});
 
   const difficultyManager = useMemo(() => DifficultyManager.getInstance(), []);
 
@@ -50,6 +51,7 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
       bottleHeight: finalBottleHeight,
       numColors: finalNumColors,
       difficulty: settings?.difficulty || "easy",
+      revealedPositions: {},
     });
     return puzzle;
   }, [game, settings, finalBottleHeight, numColors, difficultyManager]);
@@ -66,8 +68,16 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
       const result = gameAPI.autoMoveLiquid(puzzle, selectedIndex, index);
       if (result.success && result.newState) {
         difficultyManager.revealTopColors(result.newState);
-        setRevealedPositions(difficultyManager.getRevealedColors());
+        const nextRevealed = difficultyManager.getRevealedColors();
+        setRevealedPositions(nextRevealed);
         setPuzzle(result.newState);
+        saveGame({
+          puzzle: result.newState,
+          bottleHeight: finalBottleHeight,
+          numColors: settings?.numColors ?? numColors,
+          difficulty,
+          revealedPositions: nextRevealed,
+        });
         setSelectedIndex(-1);
       } else {
         setSelectedIndex(-1);
@@ -83,10 +93,12 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
     }
   };
 
+  // 이어하기 시 불러온 밝힌 위치를 매니저에 반영 (이후 이동 시 getRevealedColors()에 포함되도록)
   useEffect(() => {
-    difficultyManager.resetRevealedColors();
-    setRevealedPositions({});
-  }, [difficultyManager]);
+    if (game && game.length > 0 && savedRevealed && Object.keys(savedRevealed).length > 0) {
+      difficultyManager.setRevealedPositions(savedRevealed);
+    }
+  }, []);
 
   const visiblePuzzle = useMemo(
     () =>

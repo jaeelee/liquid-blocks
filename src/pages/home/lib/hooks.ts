@@ -7,7 +7,8 @@ export const useHome = () => {
     const navigate = useNavigate()
     const [isVisible, setIsVisible] = useState<string | null>(null)
     const [game, setGame] = useState<Puzzle>([])
-    const [settings, setSettings] = useState<Omit<GameState, 'puzzle'>>({
+    const [revealedPositions, setRevealedPositions] = useState<GameState['revealedPositions']>({})
+    const [settings, setSettings] = useState<Omit<GameState, 'puzzle' | 'revealedPositions'>>({
         difficulty: 'easy',
         bottleHeight: 4,
         numColors: 3,
@@ -18,13 +19,14 @@ export const useHome = () => {
     }
 
     const handleResumeGame = () => {
-        navigate('/game', { state: { game, settings } })
+        navigate('/game', { state: { game, settings, revealedPositions: revealedPositions ?? {} } })
     }
 
     const refresh = useCallback(() => {
         loadGame().then((saved) => {
-            const { puzzle, difficulty, bottleHeight, numColors } = saved || {}
+            const { puzzle, difficulty, bottleHeight, numColors, revealedPositions: savedRevealed } = saved || {}
             setGame(puzzle || [])
+            setRevealedPositions(savedRevealed ?? {})
             setSettings({
                 difficulty: difficulty || 'easy',
                 bottleHeight: bottleHeight || 4,

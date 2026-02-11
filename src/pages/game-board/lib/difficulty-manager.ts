@@ -111,6 +111,13 @@ export class DifficultyManager {
   }
 
   /**
+   * 저장된 밝힌 위치 복원 (이어하기 시 사용)
+   */
+  setRevealedPositions(positions: ColorVisibility): void {
+    this.colorVisibility = {...positions};
+  }
+
+  /**
    * 공개된 색상 정보 초기화
    */
   resetRevealedColors(): void {
