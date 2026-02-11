@@ -1,7 +1,7 @@
 // shared/model/types.ts (기존과 동일)
 
-import type { Bottle, Color, Puzzle } from "../../../entities/game";
-import type { Move } from "../model/types";
+import type { Bottle, Color, Puzzle } from '/entities/game';
+import type { Move } from '/pages/game-board/model/types';
 
 export interface MoveResult {
     success: boolean;

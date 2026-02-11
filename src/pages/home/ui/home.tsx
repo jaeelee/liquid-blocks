@@ -1,8 +1,8 @@
 import React from 'react';
-import {useHome} from '../lib/hooks';
-import {BottomPicker} from '../../../shared';
-import type {Difficulty} from '../../../entities/game';
-import {getDifficultyConfig} from '../../../entities/game/lib/constants';
+import { useHome } from '/pages/home/lib/hooks';
+import { BottomPicker } from '/shared';
+import type { Difficulty } from '/entities/game';
+import { getDifficultyConfig } from '/entities/game';
 
 export const Home: React.FC = () => {
   const {

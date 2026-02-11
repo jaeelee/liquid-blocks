@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { Puzzle, GameState } from '../../../entities/game'
-import { loadGame } from '../../../entities/game'
+import type { Puzzle, GameState } from '/entities/game'
+import { loadGame } from '/entities/game'
 
 export const useHome = () => {
     const navigate = useNavigate()

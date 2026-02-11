@@ -1,4 +1,4 @@
-import type { GameState } from './types'
+import type { GameState } from '/entities/game/model/types';
 
 const GAME_STORAGE_KEY = 'current_game'
 

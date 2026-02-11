@@ -1,5 +1,3 @@
-export * from './model/types'
-export * from './model/storage'
-export * from './lib/constants'
-
-
+export * from '/entities/game/model/types';
+export * from '/entities/game/model/storage';
+export * from '/entities/game/lib/constants';

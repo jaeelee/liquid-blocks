@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import './bottom-picker.css'
+import '/shared/bottom-picker/ui/bottom-picker.css';
 
 interface PickerProps<T extends string | number> {
     title?: string

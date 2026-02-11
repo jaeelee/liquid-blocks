@@ -1,5 +1,5 @@
-import type {Color, Puzzle} from '../../../entities/game';
-import type {Difficulty} from '../../../entities/game/model/types';
+import type { Color, Puzzle } from '/entities/game';
+import type { Difficulty } from '/entities/game/model/types';
 
 export interface ColorVisibility {
   [key: string]: boolean; // "bottleIndex-colorIndex" 형식의 키

@@ -1,4 +1,4 @@
-import type { Bottle, Color, Puzzle } from "../../../entities/game";
+import type { Bottle, Color, Puzzle } from '/entities/game';
 
 export interface GeneratorConfig {
     numColors: number;

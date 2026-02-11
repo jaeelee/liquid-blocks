@@ -1,7 +1,6 @@
-import { BOTTLE_HEIGHT } from "./constants";
-import type { Puzzle } from "../../../entities/game";
-import type { Move } from "../model/types";
-import type { Color } from "../../../entities/game";
+import { BOTTLE_HEIGHT } from '/pages/game-board/lib/constants';
+import type { Puzzle, Color } from '/entities/game';
+import type { Move } from '/pages/game-board/model/types';
 
 /**
  * 퍼즐이 해결되었는지 확인

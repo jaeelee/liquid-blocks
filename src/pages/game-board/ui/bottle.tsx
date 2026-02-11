@@ -1,5 +1,5 @@
 import React from "react";
-import { LIQUID_HEIGHT } from "../lib/constants";
+import { LIQUID_HEIGHT } from '/pages/game-board/lib/constants';
 
 export interface LiquidColor {
   color: string;

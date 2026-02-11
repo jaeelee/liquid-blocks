@@ -1,4 +1,4 @@
-import type {Difficulty} from '../model/types';
+import type { Difficulty } from '/entities/game/model/types';
 
 export const DIFFICULTY_CONFIG = {
   easy: {
