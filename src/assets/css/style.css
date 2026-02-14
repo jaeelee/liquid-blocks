@@ -6,14 +6,16 @@ html {
 }
 
 :root {
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  --item-height: 60px;
+  --default-active: #444; /* 다른 피커들의 기본 활성화 색상 */
 }
 
 .wrap {
@@ -136,10 +138,7 @@ button:focus-visible {
   position: relative;
   z-index: 3;
   cursor: default;
-  padding: 24px;
-  background-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
+  gap: 32px;
 }
 
 .home-container .steps .home-section {
@@ -148,6 +147,10 @@ button:focus-visible {
   font-size: 24px;
   font-weight: 700;
   color: #fff;
+  padding: 40px 24px;
+  background-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
 }
 
 /* .steps .home-section::before {
@@ -298,6 +301,78 @@ button:focus-visible {
   border-bottom-right-radius: 18px;
 }
 
+.picker-group {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  background: #222;
+  border-radius: 20px;
+}
+
+.picker-viewport {
+  position: relative;
+  height: calc(var(--item-height) * 3);
+  width: 100px;
+  overflow: hidden;
+  background: #1a1a1a;
+  border-radius: 12px;
+}
+
+.scroll-container {
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+.scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+.option {
+  height: var(--item-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: 0.3s;
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 1. 공통 활성화 스타일 (난이도, 단계, 블록용) */
+.option.active {
+  opacity: 1;
+  transform: scale(1.1);
+  font-weight: bold;
+  background-color: var(--default-active);
+  border-radius: 8px;
+}
+
+/* 2. 컬러 피커 전용 활성화 스타일 */
+/* --dynamic-color 변수가 설정된 경우 해당 색상을 사용함 */
+#picker-color .option.active {
+  background-color: var(--dynamic-color, var(--default-active));
+  box-shadow: 0 0 15px var(--dynamic-color);
+}
+
+.selection-indicator {
+  position: absolute;
+  top: var(--item-height);
+  width: 100%;
+  height: var(--item-height);
+  /* border-top: 1px solid rgba(255,255,255,0.1);
+        border-bottom: 1px solid rgba(255,255,255,0.1); */
+  pointer-events: none;
+}
+
+/* 컬러 피커의 가이드라인만 색상 연동 (선택사항) */
+#picker-color ~ .selection-indicator {
+  border-color: var(--dynamic-color);
+}
+
 @media (max-width: 960px) {
   .home-container {}
 
@@ -306,13 +381,11 @@ button:focus-visible {
   }
 
   .home-container .steps {
-    flex-direction: column;
     padding: 20px 0;
   }
 
   .home-container .steps .home-section {
     width: 100%;
-    padding: 16px;
   }
 
   .steps .home-section::before {
