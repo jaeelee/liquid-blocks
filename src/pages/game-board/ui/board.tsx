@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { COLOR, type GameState, type Puzzle } from '/entities/game';
-import { PuzzleGeneratorAPI } from '/pages/game-board/lib/game-generator';
-import { GameAPI } from '/pages/game-board/lib/game-logic';
-import { clearGame, saveGame } from '/entities/game/model/storage';
-import { isSolved } from '/pages/game-board/lib/game-solver';
-import { DifficultyManager } from '/pages/game-board/lib/difficulty-manager';
-import type { ColorVisibility } from '/pages/game-board/lib/difficulty-manager';
-import { Bottle } from '/pages/game-board/ui/bottle';
+import { COLOR, type GameState, type Puzzle } from "/entities/game";
+import { PuzzleGeneratorAPI } from "/pages/game-board/lib/game-generator";
+import { GameAPI } from "/pages/game-board/lib/game-logic";
+import { clearGame, saveGame } from "/entities/game/model/storage";
+import { isSolved } from "/pages/game-board/lib/game-solver";
+import { DifficultyManager } from "/pages/game-board/lib/difficulty-manager";
+import type { ColorVisibility } from "/pages/game-board/lib/difficulty-manager";
+import { Bottle } from "/pages/game-board/ui/bottle";
 
 export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
   bottleHeight = 4,
@@ -24,13 +24,15 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
   const finalBottleHeight = settings?.bottleHeight || bottleHeight;
   const gameAPI = useMemo(
     () => new GameAPI(finalBottleHeight),
-    [finalBottleHeight]
+    [finalBottleHeight],
   );
 
   const difficulty = settings?.difficulty ?? "easy";
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [solved, setSolved] = useState(false);
-  const [revealedPositions, setRevealedPositions] = useState<ColorVisibility>(() => savedRevealed ?? {});
+  const [revealedPositions, setRevealedPositions] = useState<ColorVisibility>(
+    () => savedRevealed ?? {},
+  );
 
   const difficultyManager = useMemo(() => DifficultyManager.getInstance(), []);
 
@@ -95,15 +97,24 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
 
   // 이어하기 시 불러온 밝힌 위치를 매니저에 반영 (이후 이동 시 getRevealedColors()에 포함되도록)
   useEffect(() => {
-    if (game && game.length > 0 && savedRevealed && Object.keys(savedRevealed).length > 0) {
+    if (
+      game &&
+      game.length > 0 &&
+      savedRevealed &&
+      Object.keys(savedRevealed).length > 0
+    ) {
       difficultyManager.setRevealedPositions(savedRevealed);
     }
   }, []);
 
   const visiblePuzzle = useMemo(
     () =>
-      difficultyManager.calculateVisibility(puzzle, difficulty, revealedPositions),
-    [puzzle, difficulty, revealedPositions, difficultyManager]
+      difficultyManager.calculateVisibility(
+        puzzle,
+        difficulty,
+        revealedPositions,
+      ),
+    [puzzle, difficulty, revealedPositions, difficultyManager],
   );
 
   useEffect(() => {
@@ -138,16 +149,18 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
 
         <div className="board-grid">
           {visiblePuzzle.bottles.map((bottle, index) => (
-            <Bottle
-              key={index}
-              maxLiquidCount={finalBottleHeight}
-              onClick={() => handleBottleClick(index)}
-              isSelected={selectedIndex === index}
-              colors={bottle.colors.map(({ color, isVisible }) => ({
-                color: COLOR[color],
-                isVisible,
-              }))}
-            />
+            <div className="tube">
+              <Bottle
+                key={index}
+                maxLiquidCount={finalBottleHeight}
+                onClick={() => handleBottleClick(index)}
+                isSelected={selectedIndex === index}
+                colors={bottle.colors.map(({ color, isVisible }) => ({
+                  color: COLOR[color],
+                  isVisible,
+                }))}
+              />
+            </div>
           ))}
         </div>
 
