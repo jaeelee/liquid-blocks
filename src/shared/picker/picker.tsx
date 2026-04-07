@@ -1,10 +1,15 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
+import type { Difficulty } from "/entities/game";
 
 // --- Types & Constants ---
 interface PickerProps {
   dataList: string[];
   onChange?: (value: string) => void;
   itemHeight?: number;
+}
+
+interface GameSettingsProps {
+  onSettingsChange: (key: string, value: string | number) => void;
 }
 
 const COLOR_MAP: Record<string, string> = {
@@ -16,10 +21,41 @@ const COLOR_MAP: Record<string, string> = {
   ORANGE: "#ffa502",
 };
 
-const LEVELS = ["쉬움", "보통", "어려움", "매우 어려움"];
-const STEPS = ["1단계", "2단계", "3단계", "4단계"];
-const BLOCKS = ["10개", "20개", "30개", "40개", "50개"];
+const LEVELS = ["쉬움", "보통", "어려움"];
+const HEIGHTS = ["4", "5", "6", "7", "8", "9", "10"];
+const COLOR_COUNTS = [
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+];
 const COLORS = Object.keys(COLOR_MAP);
+
+const DIFFICULTY_LABEL_MAP: Record<string, Difficulty> = {
+  쉬움: "easy",
+  보통: "medium",
+  어려움: "hard",
+};
+
+const DIFFICULTY_TO_LABEL: Record<Difficulty, string> = {
+  easy: "쉬움",
+  medium: "보통",
+  hard: "어려움",
+};
 
 // --- 1. Sub-Component: Picker ---
 export const Picker: React.FC<PickerProps> = ({
@@ -101,19 +137,44 @@ export const Picker: React.FC<PickerProps> = ({
 };
 
 // --- 2. Main Component: GameSettings ---
-export default function GameSettings() {
+export default function GameSettings({ onSettingsChange }: GameSettingsProps) {
   const [dynamicColor, setDynamicColor] = useState(COLOR_MAP["GRAY"]);
+
+  const handleDifficultyChange = (label: string) => {
+    const difficulty = DIFFICULTY_LABEL_MAP[label];
+    onSettingsChange("difficulty", difficulty);
+  };
+
+  const handleHeightChange = (height: string) => {
+    onSettingsChange("bottleHeight", Number(height));
+  };
+
+  const handleColorCountChange = (count: string) => {
+    onSettingsChange("numColors", Number(count));
+  };
 
   return (
     <>
       <div className="game-settings-wrapper">
-        <div className="settings-title">GAME SETTINGS</div>
+        {/* <div className="settings-title">GAME SETTINGS</div> */}
 
         <div className="picker-group">
-          {/* 일반 피커들 */}
-          <Picker dataList={LEVELS} />
-          <Picker dataList={STEPS} />
-          <Picker dataList={BLOCKS} />
+          <div>
+            <div style={{ textAlign: "center", marginBottom: "8px" }}>
+              난이도
+            </div>
+            <Picker dataList={LEVELS} onChange={handleDifficultyChange} />
+          </div>
+          <div>
+            <div style={{ textAlign: "center", marginBottom: "8px" }}>높이</div>
+            <Picker dataList={HEIGHTS} onChange={handleHeightChange} />
+          </div>
+          <div>
+            <div style={{ textAlign: "center", marginBottom: "8px" }}>
+              색상 수
+            </div>
+            <Picker dataList={COLOR_COUNTS} onChange={handleColorCountChange} />
+          </div>
 
           {/* 컬러 피커 영역: CSS 변수를 이 div에 한정하여 적용 */}
           {/* <div style={{ "--dynamic-color": dynamicColor } as React.CSSProperties}>
