@@ -6,9 +6,11 @@ interface PickerProps {
   dataList: string[];
   onChange?: (value: string) => void;
   itemHeight?: number;
+  initialValue?: string;
 }
 
 interface GameSettingsProps {
+  settings: { difficulty: Difficulty; bottleHeight: number; numColors: number };
   onSettingsChange: (key: string, value: string | number) => void;
 }
 
@@ -62,6 +64,7 @@ export const Picker: React.FC<PickerProps> = ({
   dataList,
   onChange,
   itemHeight = 60,
+  initialValue,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
@@ -70,12 +73,16 @@ export const Picker: React.FC<PickerProps> = ({
   const allItems = [...dataList, ...dataList, ...dataList];
   const baseOffset = dataList.length * itemHeight;
 
-  // 초기 스크롤 위치 설정
+  // initialValue 인덱스 계산
+  const initialIndex = initialValue ? dataList.indexOf(initialValue) : 0;
+  const targetScrollPosition = baseOffset + (initialIndex - 1) * itemHeight;
+
+  // 초기 스크롤 위치 설정 및 initialValue 변경 시 재스크롤
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.scrollTop = baseOffset;
+      containerRef.current.scrollTop = targetScrollPosition;
     }
-  }, [baseOffset]);
+  }, [targetScrollPosition, baseOffset]);
 
   const handleScroll = useCallback(() => {
     const container = containerRef.current;
@@ -137,7 +144,7 @@ export const Picker: React.FC<PickerProps> = ({
 };
 
 // --- 2. Main Component: GameSettings ---
-export default function GameSettings({ onSettingsChange }: GameSettingsProps) {
+export default function GameSettings({ settings, onSettingsChange }: GameSettingsProps) {
   const [dynamicColor, setDynamicColor] = useState(COLOR_MAP["GRAY"]);
 
   const handleDifficultyChange = (label: string) => {
@@ -163,17 +170,29 @@ export default function GameSettings({ onSettingsChange }: GameSettingsProps) {
             <div style={{ textAlign: "center", marginBottom: "8px" }}>
               난이도
             </div>
-            <Picker dataList={LEVELS} onChange={handleDifficultyChange} />
+            <Picker
+              dataList={LEVELS}
+              onChange={handleDifficultyChange}
+              initialValue={DIFFICULTY_TO_LABEL[settings.difficulty]}
+            />
           </div>
           <div>
             <div style={{ textAlign: "center", marginBottom: "8px" }}>높이</div>
-            <Picker dataList={HEIGHTS} onChange={handleHeightChange} />
+            <Picker
+              dataList={HEIGHTS}
+              onChange={handleHeightChange}
+              initialValue={String(settings.bottleHeight)}
+            />
           </div>
           <div>
             <div style={{ textAlign: "center", marginBottom: "8px" }}>
               색상 수
             </div>
-            <Picker dataList={COLOR_COUNTS} onChange={handleColorCountChange} />
+            <Picker
+              dataList={COLOR_COUNTS}
+              onChange={handleColorCountChange}
+              initialValue={String(settings.numColors)}
+            />
           </div>
 
           {/* 컬러 피커 영역: CSS 변수를 이 div에 한정하여 적용 */}

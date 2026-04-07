@@ -9,16 +9,19 @@ export const Home: React.FC = () => {
     setSettings,
     handleResumeGame,
     handleStartNewGame,
+    settingsLoaded,
   } = useHome();
 
   return (
     <div className="home-container">
-      <GameSettings
-        settings={settings}
-        onSettingsChange={(key, value) =>
-          setSettings((prev) => ({ ...prev, [key]: value }))
-        }
-      />
+      {settingsLoaded && (
+        <GameSettings
+          settings={settings}
+          onSettingsChange={(key, value) =>
+            setSettings((prev) => ({ ...prev, [key]: value }))
+          }
+        />
+      )}
       <div className="buttons">
         <button className="home-button" onClick={handleStartNewGame}>
           새 게임
