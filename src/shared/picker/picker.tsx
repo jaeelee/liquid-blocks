@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
-import type { Difficulty } from "/entities/game";
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import type { Difficulty } from '/entities/game';
 
 // --- Types & Constants ---
 interface PickerProps {
@@ -14,49 +14,49 @@ interface GameSettingsProps {
   onSettingsChange: (key: string, value: string | number) => void;
 }
 
-const COLOR_MAP: Record<string, string> = {
-  GRAY: "#444444",
-  RED: "#ff4757",
-  BLUE: "#1e90ff",
-  GREEN: "#2ed573",
-  PURPLE: "#a040ff",
-  ORANGE: "#ffa502",
-};
+// const COLOR_MAP: Record<string, string> = {
+//   GRAY: '#444444',
+//   RED: '#ff4757',
+//   BLUE: '#1e90ff',
+//   GREEN: '#2ed573',
+//   PURPLE: '#a040ff',
+//   ORANGE: '#ffa502',
+// };
 
-const LEVELS = ["쉬움", "보통", "어려움"];
-const HEIGHTS = ["4", "5", "6", "7", "8", "9", "10"];
+const LEVELS = ['쉬움', '보통', '어려움'];
+const HEIGHTS = ['4', '5', '6', '7', '8', '9', '10'];
 const COLOR_COUNTS = [
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-  "13",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "19",
-  "20",
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+  '15',
+  '16',
+  '17',
+  '18',
+  '19',
+  '20',
 ];
-const COLORS = Object.keys(COLOR_MAP);
+// const COLORS = Object.keys(COLOR_MAP);
 
 const DIFFICULTY_LABEL_MAP: Record<string, Difficulty> = {
-  쉬움: "easy",
-  보통: "medium",
-  어려움: "hard",
+  쉬움: 'easy',
+  보통: 'medium',
+  어려움: 'hard',
 };
 
 const DIFFICULTY_TO_LABEL: Record<Difficulty, string> = {
-  easy: "쉬움",
-  medium: "보통",
-  hard: "어려움",
+  easy: '쉬움',
+  medium: '보통',
+  hard: '어려움',
 };
 
 // --- 1. Sub-Component: Picker ---
@@ -117,7 +117,7 @@ export const Picker: React.FC<PickerProps> = ({
   const handleItemClick = (index: number) => {
     containerRef.current?.scrollTo({
       top: index * itemHeight - itemHeight,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   };
 
@@ -132,7 +132,7 @@ export const Picker: React.FC<PickerProps> = ({
         {allItems.map((text, index) => (
           <div
             key={index}
-            className={`option ${index === activeIndex ? "active" : ""}`}
+            className={`option ${index === activeIndex ? 'active' : ''}`}
             onClick={() => handleItemClick(index)}
           >
             {text}
@@ -144,20 +144,23 @@ export const Picker: React.FC<PickerProps> = ({
 };
 
 // --- 2. Main Component: GameSettings ---
-export default function GameSettings({ settings, onSettingsChange }: GameSettingsProps) {
-  const [dynamicColor, setDynamicColor] = useState(COLOR_MAP["GRAY"]);
+export default function GameSettings({
+  settings,
+  onSettingsChange,
+}: GameSettingsProps) {
+  // const [dynamicColor, setDynamicColor] = useState(COLOR_MAP['GRAY']);
 
   const handleDifficultyChange = (label: string) => {
     const difficulty = DIFFICULTY_LABEL_MAP[label];
-    onSettingsChange("difficulty", difficulty);
+    onSettingsChange('difficulty', difficulty);
   };
 
   const handleHeightChange = (height: string) => {
-    onSettingsChange("bottleHeight", Number(height));
+    onSettingsChange('bottleHeight', Number(height));
   };
 
   const handleColorCountChange = (count: string) => {
-    onSettingsChange("numColors", Number(count));
+    onSettingsChange('numColors', Number(count));
   };
 
   return (
@@ -167,7 +170,7 @@ export default function GameSettings({ settings, onSettingsChange }: GameSetting
 
         <div className="picker-group">
           <div>
-            <div style={{ textAlign: "center", marginBottom: "8px" }}>
+            <div style={{ textAlign: 'center', marginBottom: '8px' }}>
               난이도
             </div>
             <Picker
@@ -177,7 +180,7 @@ export default function GameSettings({ settings, onSettingsChange }: GameSetting
             />
           </div>
           <div>
-            <div style={{ textAlign: "center", marginBottom: "8px" }}>높이</div>
+            <div style={{ textAlign: 'center', marginBottom: '8px' }}>높이</div>
             <Picker
               dataList={HEIGHTS}
               onChange={handleHeightChange}
@@ -185,7 +188,7 @@ export default function GameSettings({ settings, onSettingsChange }: GameSetting
             />
           </div>
           <div>
-            <div style={{ textAlign: "center", marginBottom: "8px" }}>
+            <div style={{ textAlign: 'center', marginBottom: '8px' }}>
               색상 수
             </div>
             <Picker
