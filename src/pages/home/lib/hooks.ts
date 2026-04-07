@@ -13,6 +13,7 @@ export const useHome = () => {
         bottleHeight: 4,
         numColors: 3,
     })
+    const [settingsLoaded, setSettingsLoaded] = useState(false)
 
     const handleStartNewGame = () => {
         navigate('/game', { state: { settings } })
@@ -32,12 +33,13 @@ export const useHome = () => {
                 bottleHeight: bottleHeight || 4,
                 numColors: numColors || 3,
             })
+            setSettingsLoaded(true)
         })
     }, [])
 
     useEffect(() => { refresh() }, [refresh])
 
-    return { isVisible, game, settings, setIsVisible, setSettings, handleStartNewGame, handleResumeGame }
+    return { isVisible, game, settings, setIsVisible, setSettings, handleStartNewGame, handleResumeGame, settingsLoaded }
 }
 
 
