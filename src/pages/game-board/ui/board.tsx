@@ -1,30 +1,46 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { DifficultyManager } from '/pages/game-board/lib/difficulty-manager';
 import type { ColorVisibility } from '/pages/game-board/lib/difficulty-manager';
-import { PuzzleGeneratorAPI } from '/pages/game-board/lib/game-generator';
 import { GameAPI } from '/pages/game-board/lib/game-logic';
-import { isSolved } from '/pages/game-board/lib/game-solver';
 import { Bottle } from '/pages/game-board/ui/bottle';
 
-import { COLOR, type GameState, type Puzzle } from '/entities/game';
-import { clearGame, saveGame } from '/entities/game/model/storage';
+import { generatePuzzle, isSolved } from '/features/puzzle-generator';
+
+import {
+  COLOR,
+  type GameState,
+  type Puzzle,
+  clearGame,
+  saveGame,
+} from '/entities/game';
 
 export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
   bottleHeight = 4,
   numColors = 10,
 }) => {
-  //   const { handleStartNewGame } = useHome();
   const navigate = useNavigate();
-  const location = useLocation() as any;
+  const location = useLocation();
   const params = location.state || {};
   const game = params.game as Puzzle | undefined;
   const settings = params.settings as GameState | undefined;
   const savedRevealed = params.revealedPositions as ColorVisibility | undefined;
 
+  // 마운트 시점에 이어하기인지 새 게임인지 한 번만 확정(이후 재계산되지 않음)
+  const isResuming = !!(game && game.length > 0);
+
   const finalBottleHeight = settings?.bottleHeight || bottleHeight;
+  const finalNumColors = settings?.numColors || numColors;
+  const finalNumBottles = finalNumColors + 2;
+
   const gameAPI = useMemo(
     () => new GameAPI(finalBottleHeight),
     [finalBottleHeight],
@@ -39,14 +55,11 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
 
   const difficultyManager = useMemo(() => DifficultyManager.getInstance(), []);
 
-  const generatePuzzle = useCallback(() => {
-    if (game && game.length > 0) return game;
-
+  // 새 퍼즐을 생성해 즉시 저장까지 하는 헬퍼. 이벤트 핸들러("다시하기" 클릭)에서만
+  // 호출하며, 여기서는 saveGame 같은 부수효과를 실행해도 렌더 단계가 아니므로 안전하다.
+  const startNewGame = useCallback((): Puzzle => {
     difficultyManager.resetRevealedColors();
-    const finalNumColors = settings?.numColors || numColors;
-    const finalNumBottles = finalNumColors + 2;
-
-    const puzzle: Puzzle = PuzzleGeneratorAPI.generateCustomPuzzle({
+    const puzzle = generatePuzzle({
       numColors: finalNumColors,
       bottleHeight: finalBottleHeight,
       numBottles: finalNumBottles,
@@ -59,9 +72,50 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
       revealedPositions: {},
     });
     return puzzle;
-  }, [game, settings, finalBottleHeight, numColors, difficultyManager]);
+  }, [
+    difficultyManager,
+    finalNumColors,
+    finalBottleHeight,
+    finalNumBottles,
+    settings,
+  ]);
 
-  const [puzzle, setPuzzle] = useState<Puzzle>(() => generatePuzzle());
+  // useState의 lazy initializer는 순수 생성만 담당한다(이어하기면 기존 game 그대로,
+  // 아니면 새로 생성). localStorage 저장은 아래 useEffect로 분리했다 — 초기화 함수를
+  // StrictMode가 두 번 호출해도(개발 모드) 버려지는 첫 호출 결과가 저장되는 일이 없다.
+  const buildInitialPuzzle = useCallback((): Puzzle => {
+    if (game && game.length > 0) return game;
+
+    difficultyManager.resetRevealedColors();
+    return generatePuzzle({
+      numColors: finalNumColors,
+      bottleHeight: finalBottleHeight,
+      numBottles: finalNumBottles,
+    });
+  }, [
+    game,
+    difficultyManager,
+    finalNumColors,
+    finalBottleHeight,
+    finalNumBottles,
+  ]);
+
+  const [puzzle, setPuzzle] = useState<Puzzle>(() => buildInitialPuzzle());
+
+  // 새로 생성한 초기 퍼즐만, 실제로 렌더에 쓰인 상태 그대로 마운트 시 1회 저장한다.
+  // ref 가드로 StrictMode의 effect 이중 실행 및 이후 puzzle 변경(이동) 시 재실행을 방지.
+  const didSaveInitialPuzzle = useRef(false);
+  useEffect(() => {
+    if (isResuming || didSaveInitialPuzzle.current) return;
+    didSaveInitialPuzzle.current = true;
+    saveGame({
+      puzzle,
+      bottleHeight: finalBottleHeight,
+      numColors: finalNumColors,
+      difficulty: settings?.difficulty || 'easy',
+      revealedPositions: {},
+    });
+  }, [isResuming, puzzle, finalBottleHeight, finalNumColors, settings]);
 
   const handleBottleClick = (index: number) => {
     if (selectedIndex > -1) {
@@ -79,7 +133,7 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
         saveGame({
           puzzle: result.newState,
           bottleHeight: finalBottleHeight,
-          numColors: settings?.numColors ?? numColors,
+          numColors: finalNumColors,
           difficulty,
           revealedPositions: nextRevealed,
         });
@@ -108,7 +162,7 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
     ) {
       difficultyManager.setRevealedPositions(savedRevealed);
     }
-  }, []);
+  }, [difficultyManager, game, savedRevealed]);
 
   const visiblePuzzle = useMemo(
     () =>
@@ -139,7 +193,7 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
                   onClick={() => {
                     setSolved(false);
                     setRevealedPositions({});
-                    setPuzzle(generatePuzzle());
+                    setPuzzle(startNewGame());
                   }}
                 >
                   다시하기
@@ -152,9 +206,8 @@ export const Board: React.FC<{ bottleHeight?: number; numColors?: number }> = ({
 
         <div className="board-grid">
           {visiblePuzzle.bottles.map((bottle, index) => (
-            <div className="tube">
+            <div className="tube" key={index}>
               <Bottle
-                key={index}
                 maxLiquidCount={finalBottleHeight}
                 onClick={() => handleBottleClick(index)}
                 isSelected={selectedIndex === index}
